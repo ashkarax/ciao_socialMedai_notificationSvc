@@ -1,0 +1,15 @@
+syntax="proto3";
+
+package notif_proto;
+
+
+option go_package="./pkg/infrastructure/pb";
+
+
+
+service NotificationService{
+
+}
+
+
+

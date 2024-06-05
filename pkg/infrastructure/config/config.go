@@ -1,4 +1,6 @@
-package config
+package config_notifSvc
+
+import "github.com/spf13/viper"
 
 type PortManager struct {
 	RunnerPort     string `mapstructure:"PORTNO"`
