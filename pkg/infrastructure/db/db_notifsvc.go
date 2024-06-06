@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	domain_notifSvc "github.com/ashkarax/ciao_socialMedai_notificationSvc/pkg/domain"
 	config_notifSvc "github.com/ashkarax/ciao_socialMedai_notificationSvc/pkg/infrastructure/config"
 	interface_hash_notifSvc "github.com/ashkarax/ciao_socialMedai_notificationSvc/utils/hash_password/interface"
 
@@ -48,9 +49,9 @@ func ConnectDatabase(config *config_notifSvc.DataBase, hashUtil interface_hash_n
 	}
 
 	// Table Creation
-	// if err := DB.AutoMigrate(&domain_authSvc.Admin{}); err != nil {
-	// 	return DB, err
-	// }
+	if err := DB.AutoMigrate(&domain_notifSvc.Notification{}); err != nil {
+		return DB, err
+	}
 
 	return DB, nil
 }

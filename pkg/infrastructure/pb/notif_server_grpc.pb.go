@@ -7,7 +7,10 @@
 package pb
 
 import (
+	context "context"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NotificationServiceClient interface {
+	GetNotificationsForUser(ctx context.Context, in *RequestGetNotifications, opts ...grpc.CallOption) (*ResponseGetNotifications, error)
 }
 
 type notificationServiceClient struct {
@@ -29,10 +33,20 @@ func NewNotificationServiceClient(cc grpc.ClientConnInterface) NotificationServi
 	return &notificationServiceClient{cc}
 }
 
+func (c *notificationServiceClient) GetNotificationsForUser(ctx context.Context, in *RequestGetNotifications, opts ...grpc.CallOption) (*ResponseGetNotifications, error) {
+	out := new(ResponseGetNotifications)
+	err := c.cc.Invoke(ctx, "/notif_proto.NotificationService/GetNotificationsForUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NotificationServiceServer is the server API for NotificationService service.
 // All implementations must embed UnimplementedNotificationServiceServer
 // for forward compatibility
 type NotificationServiceServer interface {
+	GetNotificationsForUser(context.Context, *RequestGetNotifications) (*ResponseGetNotifications, error)
 	mustEmbedUnimplementedNotificationServiceServer()
 }
 
@@ -40,6 +54,9 @@ type NotificationServiceServer interface {
 type UnimplementedNotificationServiceServer struct {
 }
 
+func (UnimplementedNotificationServiceServer) GetNotificationsForUser(context.Context, *RequestGetNotifications) (*ResponseGetNotifications, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNotificationsForUser not implemented")
+}
 func (UnimplementedNotificationServiceServer) mustEmbedUnimplementedNotificationServiceServer() {}
 
 // UnsafeNotificationServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -53,13 +70,36 @@ func RegisterNotificationServiceServer(s grpc.ServiceRegistrar, srv Notification
 	s.RegisterService(&NotificationService_ServiceDesc, srv)
 }
 
+func _NotificationService_GetNotificationsForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RequestGetNotifications)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).GetNotificationsForUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/notif_proto.NotificationService/GetNotificationsForUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).GetNotificationsForUser(ctx, req.(*RequestGetNotifications))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NotificationService_ServiceDesc is the grpc.ServiceDesc for NotificationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var NotificationService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "notif_proto.NotificationService",
 	HandlerType: (*NotificationServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams:     []grpc.StreamDesc{},
-	Metadata:    "pkg/infrastructure/pb/notif_server.proto",
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetNotificationsForUser",
+			Handler:    _NotificationService_GetNotificationsForUser_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "pkg/infrastructure/pb/notif_server.proto",
 }

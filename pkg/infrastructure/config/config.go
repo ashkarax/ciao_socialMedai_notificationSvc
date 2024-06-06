@@ -3,8 +3,8 @@ package config_notifSvc
 import "github.com/spf13/viper"
 
 type PortManager struct {
-	RunnerPort     string `mapstructure:"PORTNO"`
-	PostNrelSvcUrl string `mapstructure:"POSTNREL_SVC_URL"`
+	RunnerPort string `mapstructure:"PORTNO"`
+	AuthSvcUrl string `mapstructure:"AUTH_SVC_URL"`
 }
 
 type DataBase struct {
@@ -15,14 +15,21 @@ type DataBase struct {
 	DBPort     string `mapstructure:"DBPORT"`
 }
 
+type KafkaConfigs struct {
+	KafkaPort              string `mapstructure:"KAFKA_PORT"`
+	KafkaTopicNotification string `mapstructure:"KAFKA_TOPIC_2"`
+}
+
 type Config struct {
-	PortMngr PortManager
-	DB       DataBase
+	PortMngr    PortManager
+	DB          DataBase
+	KafkaConfig KafkaConfigs
 }
 
 func LoadConfig() (*Config, error) {
 	var portmngr PortManager
 	var db DataBase
+	var kafkaconfigs KafkaConfigs
 
 	viper.AddConfigPath("./")
 	viper.SetConfigName("dev")
@@ -43,8 +50,12 @@ func LoadConfig() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = viper.Unmarshal(&kafkaconfigs)
+	if err != nil {
+		return nil, err
+	}
 
-	config := Config{PortMngr: portmngr, DB: db}
+	config := Config{PortMngr: portmngr, DB: db, KafkaConfig: kafkaconfigs}
 	return &config, nil
 
 }
